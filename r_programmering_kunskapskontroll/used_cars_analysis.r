@@ -86,7 +86,7 @@ dim(train_df)
 dim(test_df)
 
 
-# testing some linear models -------------------------------------------
+# initial linear model ------------------------------------------------
 model_01 <- lm(Pris ~ ., data = train_df)
 
 print(model_01)
@@ -110,7 +110,7 @@ ggplot(model_01, aes(.hat, .stdresid)) +
     scale_size_continuous("Cook's Distance", range = c(1, 5))
 
 
-# Running forward subset selection
+# Running forward subset selection --------------------------------------
 regfit_fwd <- regsubsets(Pris ~ ., data = train_df, nvmax = 11, method = "forward")
 summary(regfit_fwd)
 
@@ -118,7 +118,7 @@ reg_summary <- summary(regfit_fwd)
 
 names(reg_summary)
 
-# Plotting model evaluation with RSS and Adjusted Rsqr
+# Plotting subset evaluation with RSS and Adjusted Rsqr ------------------
 par(mfrow = c(1, 2))
 
 plot(reg_summary$rss, xlab = "Number of Variables", ylab = "RSS", type = "l")
@@ -129,6 +129,7 @@ points(which.max(reg_summary$adjr2), reg_summary$adjr2[11], col = "red", cex = 2
 
 coef(regfit_fwd, 8)
 
+# second model with fewer variables ------------------------------------
 model_02 <- lm(Pris ~ Märke + Växellåda + Miltal + Biltyp + HK + Ålder + Dagar_i_trafik, data = train_df)
 
 model_02_summary <- summary(model_03)
@@ -137,7 +138,7 @@ model_02_summary
 names(model_02_summary)
 model_02_summary$adj.r.squared
 
-
+# comparing the two models ---------------------------------------------
 results <- data.frame(
     Model = c("Model 1", "Model 2"),
     Adj_R_squared = c(
