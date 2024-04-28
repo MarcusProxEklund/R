@@ -130,7 +130,16 @@ points(which.max(reg_summary$adjr2), reg_summary$adjr2[11], col = "red", cex = 2
 coef(regfit_fwd, 8)
 
 # second model with fewer variables ------------------------------------
-model_02 <- lm(Pris ~ Märke + Växellåda + Miltal + Biltyp + HK + Ålder + Dagar_i_trafik, data = train_df)
+model_02 <- lm(
+    Pris ~ Märke +
+        Växellåda +
+        Miltal +
+        Biltyp +
+        HK +
+        Ålder +
+        Dagar_i_trafik,
+    data = train_df
+)
 
 model_02_summary <- summary(model_03)
 model_02_summary
@@ -215,12 +224,12 @@ pxweb_query_list <-
     list("Region" = c("00"),
         "Agarkategori" = c("000"),
         "ContentsCode" = c("TK1001AB"),
-        "Tid" = c("2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023"))
+        "Tid" = c("2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"))
 
-# Download data
+# Download data 
 px_data <-
     pxweb_get(url = "https://api.scb.se/OV0104/v1/doris/sv/ssd/START/TK/TK1001/TK1001A/PersBilarA",
-            query = pxweb_query_list)
+                query = pxweb_query_list)
 
 # Convert to data.frame
 px_data_frame <- as.data.frame(px_data, column.name.type = "text", variable.value.type = "text")
@@ -237,11 +246,19 @@ names(px_data_frame)
 str(px_data_frame)
 
 scb_df <- px_data_frame |>
-    mutate(across(c("år", "Personbilar i trafik"), as.numeric)) |>
+    mutate(across(c("år", "Personbilar i trafik"), as.integer)) |>
     rename(personbilar_i_trafik = `Personbilar i trafik`) |>
     na.omit()
 
 str(scb_df)
+View(scb_df)
 
 ggplot(scb_df, aes(år, personbilar_i_trafik)) +
-    geom_line()
+    geom_line() +
+    scale_y_continuous()
+
+tail(scb_df$personbilar_i_trafik, n = 1) - scb_df$personbilar_i_trafik[1]
+
+diff_21_22 <- max(scb_df$personbilar_i_trafik) - tail(scb_df$personbilar_i_trafik, n = 1)
+prcnt <- diff_21_22 / max(scb_df$personbilar_i_trafik)
+prcnt
